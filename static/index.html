@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Casino</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-color: #2c3e50; 
+            color: white; 
+            padding: 2rem; 
+        }
+        .slot-machine { 
+            background: #34495e; 
+            padding: 20px; 
+            border-radius: 10px; 
+            display: inline-block; 
+            margin-top: 20px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 80px); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        .cell { 
+            background: #ecf0f1; 
+            color: #2c3e50; 
+            font-size: 2rem; 
+            font-weight: bold; 
+            width: 80px; 
+            height: 80px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 5px; 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+        .controls { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            align-items: center; 
+        }
+        input, button { 
+            padding: 10px; 
+            font-size: 1rem; 
+            border-radius: 5px; 
+            border: none; 
+        }
+        button { 
+            background-color: #e74c3c; 
+            color: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: background-color 0.2s;
+        }
+        button:hover:not(:disabled) { 
+            background-color: #c0392b; 
+        }
+        button:disabled, input:disabled {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #message { 
+            margin-top: 15px; 
+            font-weight: bold; 
+            color: #f1c40f; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎰 The Go Casino 🎰</h1>
+    
+    <div class="slot-machine">
+        <h2>Balance: $<span id="balanceDisplay">200</span></h2>
+        
+        <div class="grid" id="slotGrid">
+            <div class="cell">?</div><div class="cell">?</div><div class="cell">?</div>
+            <div class="cell">?</div><div class="cell">?</div><div class="cell">?</div>
+            <div class="cell">?</div><div class="cell">?</div><div class="cell">?</div>
+        </div>
+
+        <div class="controls">
+            <label>Bet Amount (Enter 0 to Quit):</label>
+            <input type="number" id="betInput" value="10" min="0">
+            <button id="spinBtn" onclick="playSpin()">SPIN!</button>
+            <div id="message">Welcome! Place your bet.</div>
+        </div>
+    </div>
+
+    <script>
+        let currentBalance = 200;
+
+        // Function to lock the game UI when it ends
+        function endGame(message) {
+            document.getElementById('message').innerText = message;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('betInput').disabled = true;
+        }
+
+        async function playSpin() {
+            const betAmount = parseInt(document.getElementById('betInput').value);
+            const msgEl = document.getElementById('message');
+
+            // 1. Check if user wants to quit by entering 0
+            if (betAmount === 0) {
+                endGame("Thanks for playing!!");
+                return;
+            }
+
+            // 2. Prevent betting more than balance
+            if (betAmount > currentBalance) {
+                msgEl.innerText = "Bet cannot be larger than balance!!";
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/spin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ bet: betAmount, balance: currentBalance })
+                });
+
+                const data = await response.json();
+
+                if (data.message === "Bet cannot be larger than balance!!") {
+                    msgEl.innerText = data.message;
+                    return;
+                }
+
+                // Update UI grid and balance
+                updateGrid(data.spin);
+                currentBalance = data.newBalance;
+                document.getElementById('balanceDisplay').innerText = currentBalance;
+                
+                // 3. Check if the user is out of money after the spin
+                if (currentBalance <= 0) {
+                    endGame("Game Over! Thanks for playing!!");
+                    return; // Stop execution here so we don't overwrite the Game Over message
+                }
+
+                // Standard win/loss messaging if game is still active
+                if (data.winAmount > 0) {
+                    msgEl.innerText = `You won $${data.winAmount}!`;
+                } else {
+                    msgEl.innerText = "Better luck next time!";
+                }
+
+            } catch (error) {
+                console.error("Error communicating with server:", error);
+                msgEl.innerText = "Server error. Is your Go server running?";
+            }
+        }
+
+        function updateGrid(spinMatrix) {
+            const grid = document.getElementById('slotGrid');
+            grid.innerHTML = ""; 
+            
+            for (let row = 0; row < spinMatrix.length; row++) {
+                for (let col = 0; col < spinMatrix[row].length; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.innerText = spinMatrix[row][col];
+                    grid.appendChild(cell);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
