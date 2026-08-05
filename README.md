@@ -4,7 +4,7 @@ A full-stack web-based slot machine game. This project features a robust backend
 
 It was transitioned from a terminal-based Go application into a stateless web server, utilizing a RESTful API to handle game logic, bets, and balances.
 
-## ✨ Features
+## Features
 
 * **Full-Stack Architecture:** Go handles the math, state validation, and API routing, while the browser renders the UI.
 * **Stateless API:** Game spins and balance calculations are processed securely on the backend via a `/api/spin` endpoint.
@@ -41,7 +41,7 @@ go-casino/
 
 
 
-## 🚀 How to Run Locally
+## How to Run Locally
 
 ### Prerequisites
 
@@ -67,7 +67,7 @@ go run .
 
 5. Open your web browser and navigate to: **http://localhost:8080**
 
-## ☁️ How to Deploy (Render)
+## How to Deploy (Render)
 
 This project is configured to read the `PORT` environment variable, making it immediately compatible with modern cloud hosts.
 
@@ -83,7 +83,7 @@ This project is configured to read the `PORT` environment variable, making it im
 
 6. Deploy! Your app will be live on an `.onrender.com` domain.
 
-## 🎮 How to Play
+## How to Play
 
 1. Enter your desired bet amount in the input field.
 2. Click **SPIN!**
