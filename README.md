@@ -1,7 +1,3 @@
-Here is a complete and professional `README.md` file for your project. You can save this in the root of your project directory as `README.md`. It explains what the project is, how it is structured, and how anyone can run or deploy it.
-
----
-
 # 🎰 Go Casino - Web Slot Machine
 
 A full-stack web-based slot machine game. This project features a robust backend built in Go and a modern, responsive frontend built with vanilla HTML, CSS, and JavaScript.
