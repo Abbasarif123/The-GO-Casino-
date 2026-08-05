@@ -4,6 +4,8 @@ A full-stack web-based slot machine game. This project features a robust backend
 
 It was transitioned from a terminal-based Go application into a stateless web server, utilizing a RESTful API to handle game logic, bets, and balances.
 
+Since Github pages cannot run Go code. Please follow the steps to run this project below.
+
 ## Features
 
 * **Full-Stack Architecture:** Go handles the math, state validation, and API routing, while the browser renders the UI.
